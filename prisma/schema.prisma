@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  type      UserType
+  status    UserStatus @default(ACTIVE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  ownedProperties Property[] @relation("PropertyOwner")
+  bookings        Booking[]
+  sentMessages    Message[]  @relation("MessageSender")
+  payments        Payment[]
+}
+
+model Property {
+  id          String         @id @default(cuid())
+  title       String
+  sqFeet      Int
+  price       String
+  location    String
+  status      PropertyStatus @default(AVAILABLE)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  ownerId     String
+  
+  // Relations
+  owner    User      @relation("PropertyOwner", fields: [ownerId], references: [id])
+  bookings Booking[]
+}
+
+model Booking {
+  id         String        @id @default(cuid())
+  startDate  DateTime
+  endDate    DateTime
+  amount     String
+  status     BookingStatus @default(PENDING)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  propertyId String
+  tenantId   String
+  
+  // Relations
+  property Property @relation(fields: [propertyId], references: [id])
+  tenant   User     @relation(fields: [tenantId], references: [id])
+  payments Payment[]
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  amount    String
+  method    String
+  status    PaymentStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  bookingId String
+  userId    String
+  
+  // Relations
+  booking Booking @relation(fields: [bookingId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id        String        @id @default(cuid())
+  subject   String
+  message   String
+  type      MessageType
+  status    MessageStatus @default(UNREAD)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  senderId  String
+  
+  // Relations
+  sender User @relation("MessageSender", fields: [senderId], references: [id])
+}
+
+enum UserType {
+  OWNER
+  TENANT
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum PropertyStatus {
+  AVAILABLE
+  RENTED
+  MAINTENANCE
+}
+
+enum BookingStatus {
+  PENDING
+  ACTIVE
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum MessageType {
+  INQUIRY
+  SUPPORT
+  BOOKING
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+  REPLIED
+}
