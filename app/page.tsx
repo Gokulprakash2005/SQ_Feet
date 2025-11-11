@@ -128,7 +128,7 @@ export default function Home() {
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }} suppressHydrationWarning={true}>
       <h1>SQ Feet Realty - Property Management</h1>
       
       {/* Search */}
@@ -145,7 +145,7 @@ export default function Home() {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} style={{ marginBottom: '30px', border: '1px solid #ccc', padding: '20px' }}>
+      <form onSubmit={handleSubmit} style={{ marginBottom: '30px', border: '1px solid #ccc', padding: '20px' }} suppressHydrationWarning={true}>
         <h3>{editingId ? 'Edit Property' : 'Add New Property'}</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
           <input
