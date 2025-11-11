@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     return NextResponse.json(properties);
   } catch (error) {
     console.error('Database error:', error);
-    return NextResponse.json({ error: 'Failed to fetch properties', details: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch properties', details: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
 }
 
@@ -31,6 +31,6 @@ export async function POST(request: Request) {
     return NextResponse.json(property);
   } catch (error) {
     console.error('Database error:', error);
-    return NextResponse.json({ error: 'Failed to create property', details: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to create property', details: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
 }
