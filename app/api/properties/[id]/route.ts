@@ -15,7 +15,7 @@ export async function OPTIONS() {
 // PUT update property by id
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
-    const { id } = params;
+    const { id } = params; // no await
     const body = await request.json();
     const property = await prisma.property.update({
       where: { id },
@@ -34,7 +34,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 // DELETE property by id
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
-    const { id } = params;
+    const { id } = params; // no await
     await prisma.property.delete({ where: { id } });
     return NextResponse.json({ message: 'Property deleted successfully' }, { headers: corsHeaders });
   } catch (error) {
