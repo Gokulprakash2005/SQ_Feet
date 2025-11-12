@@ -1,56 +1,36 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
-
-// Handle preflight requests
-export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
-}
-
-// GET all properties (with optional search)
 export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const search = searchParams.get('search');
+
   try {
-    const { searchParams } = new URL(request.url);
-    const search = searchParams.get('search');
-
     const properties = await prisma.property.findMany({
-      where: search
-        ? {
-            OR: [
-              { title: { contains: search, mode: 'insensitive' } },
-              { location: { contains: search, mode: 'insensitive' } },
-            ],
-          }
-        : {},
-      orderBy: { createdAt: 'desc' },
+      where: search ? {
+        OR: [
+          { title: { contains: search, mode: 'insensitive' } },
+          { location: { contains: search, mode: 'insensitive' } },
+        ]
+      } : {},
+      orderBy: { createdAt: 'desc' }
     });
-
-    return NextResponse.json(properties, { headers: corsHeaders });
+    return NextResponse.json(properties);
   } catch (error) {
     console.error('Database error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch properties', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500, headers: corsHeaders }
-    );
+    return NextResponse.json({ error: 'Failed to fetch properties', details: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
 }
 
-// POST create new property
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const property = await prisma.property.create({ data: body });
-    return NextResponse.json(property, { headers: corsHeaders });
+    const property = await prisma.property.create({
+      data: body
+    });
+    return NextResponse.json(property);
   } catch (error) {
     console.error('Database error:', error);
-    return NextResponse.json(
-      { error: 'Failed to create property', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500, headers: corsHeaders }
-    );
+    return NextResponse.json({ error: 'Failed to create property', details: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
 }
