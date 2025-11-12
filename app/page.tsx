@@ -139,9 +139,10 @@ export default function Home() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{ padding: '8px', marginRight: '10px', width: '300px' }}
+          suppressHydrationWarning={true}
         />
-        <button onClick={handleSearch} style={{ padding: '8px 16px' }}>Search</button>
-        <button onClick={() => { setSearch(''); fetchProperties(); }} style={{ padding: '8px 16px', marginLeft: '10px' }}>Clear</button>
+        <button onClick={handleSearch} style={{ padding: '8px 16px' }} suppressHydrationWarning={true}>Search</button>
+        <button onClick={() => { setSearch(''); fetchProperties(); }} style={{ padding: '8px 16px', marginLeft: '10px' }} suppressHydrationWarning={true}>Clear</button>
       </div>
 
       {/* Form */}
@@ -155,6 +156,7 @@ export default function Home() {
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             required
             style={{ padding: '8px' }}
+            suppressHydrationWarning={true}
           />
           <input
             type="text"
@@ -163,6 +165,7 @@ export default function Home() {
             onChange={(e) => setFormData({ ...formData, location: e.target.value })}
             required
             style={{ padding: '8px' }}
+            suppressHydrationWarning={true}
           />
           <input
             type="number"
@@ -171,6 +174,7 @@ export default function Home() {
             onChange={(e) => setFormData({ ...formData, price: e.target.value })}
             required
             style={{ padding: '8px' }}
+            suppressHydrationWarning={true}
           />
           <input
             type="number"
@@ -179,6 +183,7 @@ export default function Home() {
             onChange={(e) => setFormData({ ...formData, sqFeet: e.target.value })}
             required
             style={{ padding: '8px' }}
+            suppressHydrationWarning={true}
           />
           <input
             type="number"
@@ -187,6 +192,7 @@ export default function Home() {
             onChange={(e) => setFormData({ ...formData, bedrooms: e.target.value })}
             required
             style={{ padding: '8px' }}
+            suppressHydrationWarning={true}
           />
           <input
             type="number"
@@ -195,6 +201,7 @@ export default function Home() {
             onChange={(e) => setFormData({ ...formData, bathrooms: e.target.value })}
             required
             style={{ padding: '8px' }}
+            suppressHydrationWarning={true}
           />
         </div>
         <textarea
@@ -204,7 +211,7 @@ export default function Home() {
           style={{ padding: '8px', marginTop: '10px', width: '100%', height: '60px' }}
         />
         <div style={{ marginTop: '10px' }}>
-          <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none' }}>
+          <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none' }} suppressHydrationWarning={true}>
             {editingId ? 'Update Property' : 'Add Property'}
           </button>
           {editingId && (
