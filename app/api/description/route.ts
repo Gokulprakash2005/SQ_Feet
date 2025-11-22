@@ -11,8 +11,18 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: corsHeaders })
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const title = searchParams.get('title')
+    
+    if (title) {
+      const description = await prisma.description.findFirst({
+        where: { realSecurity: { contains: title, mode: 'insensitive' } }
+      })
+      return NextResponse.json(description, { headers: corsHeaders })
+    }
+    
     const descriptions = await prisma.description.findMany({
       orderBy: { createdAt: 'desc' }
     })

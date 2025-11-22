@@ -15,6 +15,14 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search')
+    const title = searchParams.get('title')
+    
+    if (title) {
+      const templateDetail = await prisma.templateDetails.findFirst({
+        where: { propertyTitle: title }
+      })
+      return NextResponse.json(templateDetail, { headers: corsHeaders })
+    }
     
     const templateDetails = await prisma.templateDetails.findMany({
       where: search ? {

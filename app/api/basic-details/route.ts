@@ -6,8 +6,18 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: corsHeaders })
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const title = searchParams.get('title')
+    
+    if (title) {
+      const basicDetail = await prisma.basicDetails.findFirst({
+        where: { propertyType: { contains: title, mode: 'insensitive' } }
+      })
+      return NextResponse.json(basicDetail, { headers: corsHeaders })
+    }
+    
     const basicDetails = await prisma.basicDetails.findMany({
       orderBy: { createdAt: 'desc' }
     })

@@ -1,15 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { corsHeaders } from '@/lib/cors'
 
-export async function GET() {
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders })
+}
+
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const title = searchParams.get('title')
+    
+    if (title) {
+      const areaDetail = await prisma.areaDetails.findFirst({
+        where: { builtUpArea: { contains: title, mode: 'insensitive' } }
+      })
+      return NextResponse.json(areaDetail, { headers: corsHeaders })
+    }
+    
     const areaDetails = await prisma.areaDetails.findMany({
       orderBy: { createdAt: 'desc' }
     })
-    return NextResponse.json(areaDetails || [])
+    return NextResponse.json(areaDetails || [], { headers: corsHeaders })
   } catch (error) {
     console.error('Area details fetch error:', error)
-    return NextResponse.json([])
+    return NextResponse.json([], { headers: corsHeaders })
   }
 }
 
@@ -26,9 +41,9 @@ export async function POST(request: NextRequest) {
       }
     })
     
-    return NextResponse.json(areaDetails)
+    return NextResponse.json(areaDetails, { headers: corsHeaders })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create area details' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create area details' }, { status: 500, headers: corsHeaders })
   }
 }
 
@@ -46,9 +61,9 @@ export async function PUT(request: NextRequest) {
       }
     })
     
-    return NextResponse.json(areaDetails)
+    return NextResponse.json(areaDetails, { headers: corsHeaders })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to update area details' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to update area details' }, { status: 500, headers: corsHeaders })
   }
 }
 
@@ -61,8 +76,8 @@ export async function DELETE(request: NextRequest) {
       where: { id: parseInt(id!) }
     })
     
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true }, { headers: corsHeaders })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to delete area details' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to delete area details' }, { status: 500, headers: corsHeaders })
   }
 }
