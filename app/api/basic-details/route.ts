@@ -1,15 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { corsHeaders } from '@/lib/cors'
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders })
+}
 
 export async function GET() {
   try {
     const basicDetails = await prisma.basicDetails.findMany({
       orderBy: { createdAt: 'desc' }
     })
-    return NextResponse.json(basicDetails || [])
+    return NextResponse.json(basicDetails || [], { headers: corsHeaders })
   } catch (error) {
     console.error('Basic details fetch error:', error)
-    return NextResponse.json([])
+    return NextResponse.json([], { headers: corsHeaders })
   }
 }
 
@@ -29,9 +34,9 @@ export async function POST(request: NextRequest) {
       }
     })
     
-    return NextResponse.json(basicDetails)
+    return NextResponse.json(basicDetails, { headers: corsHeaders })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create basic details' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create basic details' }, { status: 500, headers: corsHeaders })
   }
 }
 
@@ -52,9 +57,9 @@ export async function PUT(request: NextRequest) {
       }
     })
     
-    return NextResponse.json(basicDetails)
+    return NextResponse.json(basicDetails, { headers: corsHeaders })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to update basic details' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to update basic details' }, { status: 500, headers: corsHeaders })
   }
 }
 
@@ -67,8 +72,8 @@ export async function DELETE(request: NextRequest) {
       where: { id: parseInt(id!) }
     })
     
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true }, { headers: corsHeaders })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to delete basic details' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to delete basic details' }, { status: 500, headers: corsHeaders })
   }
 }
