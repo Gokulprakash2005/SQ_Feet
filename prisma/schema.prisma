@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // uncomment next line if you use Prisma <5.10
+  // directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+model TemplateDetails {
+  id              Int      @id @default(autoincrement())
+  propertyTitle   String
+  locationAddress String
+  city            String
+  price           Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Description {
+  id                   Int      @id @default(autoincrement())
+  realSecurity         String
+  ampleParking         String
+  smartHomeIntegration String
+  verifiedSafety       String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model BasicDetails {
+  id           Int      @id @default(autoincrement())
+  propertyType String
+  propertySize String
+  bedrooms     Int
+  bathrooms    Int
+  balconies    Int
+  totalFloors  Int
+  floorNumber  Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Location {
+  id        Int      @id @default(autoincrement())
+  address   String
+  city      String
+  pincode   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StatusAvailability {
+  id               Int      @id @default(autoincrement())
+  propertyStatus   String
+  ageOfProperty    String
+  availableFrom    DateTime
+  furnishingStatus String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model AreaDetails {
+  id              Int      @id @default(autoincrement())
+  builtUpArea     String
+  undividedShare  String
+  amenities       String
+  features        String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
