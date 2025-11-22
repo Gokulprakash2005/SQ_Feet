@@ -6,9 +6,10 @@ export async function GET() {
     const descriptions = await prisma.description.findMany({
       orderBy: { createdAt: 'desc' }
     })
-    return NextResponse.json(descriptions)
+    return NextResponse.json(descriptions || [])
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch descriptions' }, { status: 500 })
+    console.error('Description fetch error:', error)
+    return NextResponse.json([])
   }
 }
 

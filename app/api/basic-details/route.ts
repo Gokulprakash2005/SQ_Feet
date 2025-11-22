@@ -6,9 +6,10 @@ export async function GET() {
     const basicDetails = await prisma.basicDetails.findMany({
       orderBy: { createdAt: 'desc' }
     })
-    return NextResponse.json(basicDetails)
+    return NextResponse.json(basicDetails || [])
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch basic details' }, { status: 500 })
+    console.error('Basic details fetch error:', error)
+    return NextResponse.json([])
   }
 }
 

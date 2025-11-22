@@ -6,9 +6,10 @@ export async function GET() {
     const locations = await prisma.location.findMany({
       orderBy: { createdAt: 'desc' }
     })
-    return NextResponse.json(locations)
+    return NextResponse.json(locations || [])
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch locations' }, { status: 500 })
+    console.error('Location fetch error:', error)
+    return NextResponse.json([])
   }
 }
 

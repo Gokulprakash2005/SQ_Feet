@@ -22,9 +22,10 @@ export default function AdminPage() {
         : `/api/${endpoint}`
       const response = await fetch(url)
       const result = await response.json()
-      setData(result)
+      setData(Array.isArray(result) ? result : [])
     } catch (error) {
       console.error('Error fetching data:', error)
+      setData([])
     }
   }
 

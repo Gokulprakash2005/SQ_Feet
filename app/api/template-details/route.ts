@@ -16,9 +16,10 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' }
     })
     
-    return NextResponse.json(templateDetails)
+    return NextResponse.json(templateDetails || [])
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch template details' }, { status: 500 })
+    console.error('Template details fetch error:', error)
+    return NextResponse.json([])
   }
 }
 

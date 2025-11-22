@@ -6,9 +6,10 @@ export async function GET() {
     const statusAvailability = await prisma.statusAvailability.findMany({
       orderBy: { createdAt: 'desc' }
     })
-    return NextResponse.json(statusAvailability)
+    return NextResponse.json(statusAvailability || [])
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch status availability' }, { status: 500 })
+    console.error('Status availability fetch error:', error)
+    return NextResponse.json([])
   }
 }
 
