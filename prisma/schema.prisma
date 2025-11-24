@@ -18,6 +18,7 @@ model TemplateDetails {
   locationAddress String
   city            String
   price           Int
+  imageUrl        String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

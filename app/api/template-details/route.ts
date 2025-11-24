@@ -50,7 +50,8 @@ export async function POST(request: NextRequest) {
         propertyTitle: data.propertyTitle,
         locationAddress: data.locationAddress,
         city: data.city,
-        price: parseInt(data.price)
+        price: parseInt(data.price),
+        imageUrl: data.imageUrl
       }
     })
     
@@ -70,7 +71,8 @@ export async function PUT(request: NextRequest) {
         propertyTitle: data.propertyTitle,
         locationAddress: data.locationAddress,
         city: data.city,
-        price: parseInt(data.price)
+        price: parseInt(data.price),
+        imageUrl: data.imageUrl
       }
     })
     
