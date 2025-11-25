@@ -9,12 +9,15 @@ export async function OPTIONS() {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const title = searchParams.get('title')
+    const id = searchParams.get('id')
     
-    if (title) {
-      const areaDetail = await prisma.areaDetails.findFirst({
-        where: { builtUpArea: { contains: title, mode: 'insensitive' } }
+    if (id) {
+      const areaDetail = await prisma.areaDetails.findUnique({
+        where: { id: parseInt(id) }
       })
+      if (!areaDetail) {
+        return NextResponse.json({ error: `Area details not found with ID ${id}` }, { status: 404, headers: corsHeaders })
+      }
       return NextResponse.json(areaDetail, { headers: corsHeaders })
     }
     
@@ -34,6 +37,7 @@ export async function POST(request: NextRequest) {
     
     const areaDetails = await prisma.areaDetails.create({
       data: {
+        id: parseInt(data.id),
         builtUpArea: data.builtUpArea,
         undividedShare: data.undividedShare,
         amenities: data.amenities,

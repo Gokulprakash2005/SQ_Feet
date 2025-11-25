@@ -9,13 +9,13 @@ export async function OPTIONS() {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const title = searchParams.get('title')
+    const id = searchParams.get('id')
     
-    if (title) {
-      const basicDetail = await prisma.basicDetails.findFirst({
-        where: { propertyType: { contains: title, mode: 'insensitive' } }
+    if (id) {
+      const basicDetail = await prisma.basicDetails.findUnique({
+        where: { id: parseInt(id) }
       })
-      return NextResponse.json(basicDetail, { headers: corsHeaders })
+      return NextResponse.json(basicDetail || null, { headers: corsHeaders })
     }
     
     const basicDetails = await prisma.basicDetails.findMany({
@@ -24,7 +24,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(basicDetails || [], { headers: corsHeaders })
   } catch (error) {
     console.error('Basic details fetch error:', error)
-    return NextResponse.json([], { headers: corsHeaders })
+    const id = new URL(request.url).searchParams.get('id')
+    return NextResponse.json(id ? null : [], { headers: corsHeaders })
   }
 }
 
@@ -34,6 +35,7 @@ export async function POST(request: NextRequest) {
     
     const basicDetails = await prisma.basicDetails.create({
       data: {
+        id: parseInt(data.id),
         propertyType: data.propertyType,
         propertySize: data.propertySize,
         bedrooms: parseInt(data.bedrooms),

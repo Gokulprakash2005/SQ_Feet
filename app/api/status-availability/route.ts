@@ -9,12 +9,15 @@ export async function OPTIONS() {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const title = searchParams.get('title')
+    const id = searchParams.get('id')
     
-    if (title) {
-      const statusAvailability = await prisma.statusAvailability.findFirst({
-        where: { propertyStatus: { contains: title, mode: 'insensitive' } }
+    if (id) {
+      const statusAvailability = await prisma.statusAvailability.findUnique({
+        where: { id: parseInt(id) }
       })
+      if (!statusAvailability) {
+        return NextResponse.json({ error: `Status availability not found with ID ${id}` }, { status: 404, headers: corsHeaders })
+      }
       return NextResponse.json(statusAvailability, { headers: corsHeaders })
     }
     
@@ -34,6 +37,7 @@ export async function POST(request: NextRequest) {
     
     const statusAvailability = await prisma.statusAvailability.create({
       data: {
+        id: parseInt(data.id),
         propertyStatus: data.propertyStatus,
         ageOfProperty: data.ageOfProperty,
         availableFrom: new Date(data.availableFrom),

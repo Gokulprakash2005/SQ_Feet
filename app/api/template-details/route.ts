@@ -15,12 +15,15 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search')
-    const title = searchParams.get('title')
+    const id = searchParams.get('id')
     
-    if (title) {
-      const templateDetail = await prisma.templateDetails.findFirst({
-        where: { propertyTitle: title }
+    if (id) {
+      const templateDetail = await prisma.templateDetails.findUnique({
+        where: { id: parseInt(id) }
       })
+      if (!templateDetail) {
+        return NextResponse.json({ error: `Template details not found with ID ${id}` }, { status: 404, headers: corsHeaders })
+      }
       return NextResponse.json(templateDetail, { headers: corsHeaders })
     }
     

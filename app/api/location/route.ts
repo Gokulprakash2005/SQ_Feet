@@ -9,12 +9,15 @@ export async function OPTIONS() {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const title = searchParams.get('title')
+    const id = searchParams.get('id')
     
-    if (title) {
-      const location = await prisma.location.findFirst({
-        where: { city: { contains: title, mode: 'insensitive' } }
+    if (id) {
+      const location = await prisma.location.findUnique({
+        where: { id: parseInt(id) }
       })
+      if (!location) {
+        return NextResponse.json({ error: `Location not found with ID ${id}` }, { status: 404, headers: corsHeaders })
+      }
       return NextResponse.json(location, { headers: corsHeaders })
     }
     
