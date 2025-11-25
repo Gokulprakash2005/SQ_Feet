@@ -37,6 +37,7 @@ export async function POST(request: NextRequest) {
     
     const location = await prisma.location.create({
       data: {
+        id: parseInt(data.id),
         address: data.address,
         city: data.city,
         pincode: parseInt(data.pincode)
