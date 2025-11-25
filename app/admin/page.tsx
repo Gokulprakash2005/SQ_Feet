@@ -227,6 +227,7 @@ export default function AdminPage() {
             {activeTab === 'template' && (
               <form ref={(el) => { formRefs.current['template'] = el }} onSubmit={(e) => handleSubmit(e, 'template-details')} className="space-y-4">
                 <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit' : 'Add'} Template Details</h2>
+                <input name="id" type="number" placeholder="ID" className="w-full p-3 border rounded" required />
                 <input name="propertyTitle" placeholder="Property Title" className="w-full p-3 border rounded" required />
                 <input name="locationAddress" placeholder="Location Address" className="w-full p-3 border rounded" required />
                 <input name="city" placeholder="City" className="w-full p-3 border rounded" required />
@@ -248,6 +249,7 @@ export default function AdminPage() {
             {activeTab === 'description' && (
               <form ref={(el) => { formRefs.current['description'] = el }} onSubmit={(e) => handleSubmit(e, 'description')} className="space-y-4">
                 <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit' : 'Add'} Description</h2>
+                <input name="id" type="number" placeholder="ID" className="w-full p-3 border rounded" required />
                 <textarea name="realSecurity" placeholder="Real Security" className="w-full p-3 border rounded h-24" required />
                 <textarea name="ampleParking" placeholder="Ample Parking" className="w-full p-3 border rounded h-24" required />
                 <textarea name="smartHomeIntegration" placeholder="Smart Home Integration" className="w-full p-3 border rounded h-24" required />
@@ -268,6 +270,7 @@ export default function AdminPage() {
             {activeTab === 'basic' && (
               <form ref={(el) => { formRefs.current['basic'] = el }} onSubmit={(e) => handleSubmit(e, 'basic-details')} className="space-y-4">
                 <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit' : 'Add'} Basic Details</h2>
+                <input name="id" type="number" placeholder="ID" className="w-full p-3 border rounded" required />
                 <input name="propertyType" placeholder="Property Type" className="w-full p-3 border rounded" required />
                 <input name="propertySize" placeholder="Property Size" className="w-full p-3 border rounded" required />
                 <input name="bedrooms" type="number" placeholder="Bedrooms" className="w-full p-3 border rounded" required />
@@ -291,6 +294,7 @@ export default function AdminPage() {
             {activeTab === 'location' && (
               <form ref={(el) => { formRefs.current['location'] = el }} onSubmit={(e) => handleSubmit(e, 'location')} className="space-y-4">
                 <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit' : 'Add'} Location</h2>
+                <input name="id" type="number" placeholder="ID" className="w-full p-3 border rounded" required />
                 <input name="address" placeholder="Address" className="w-full p-3 border rounded" required />
                 <input name="city" placeholder="City" className="w-full p-3 border rounded" required />
                 <input name="pincode" type="number" placeholder="Pincode" className="w-full p-3 border rounded" required />
@@ -310,6 +314,7 @@ export default function AdminPage() {
             {activeTab === 'status' && (
               <form ref={(el) => { formRefs.current['status'] = el }} onSubmit={(e) => handleSubmit(e, 'status-availability')} className="space-y-4">
                 <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit' : 'Add'} Status & Availability</h2>
+                <input name="id" type="number" placeholder="ID" className="w-full p-3 border rounded" required />
                 <input name="propertyStatus" placeholder="Property Status" className="w-full p-3 border rounded" required />
                 <input name="ageOfProperty" placeholder="Age of Property" className="w-full p-3 border rounded" required />
                 <input name="availableFrom" type="datetime-local" placeholder="Available From" className="w-full p-3 border rounded" required />
@@ -330,6 +335,7 @@ export default function AdminPage() {
             {activeTab === 'area' && (
               <form ref={(el) => { formRefs.current['area'] = el }} onSubmit={(e) => handleSubmit(e, 'area-details')} className="space-y-4">
                 <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit' : 'Add'} Area Details</h2>
+                <input name="id" type="number" placeholder="ID" className="w-full p-3 border rounded" required />
                 <input name="builtUpArea" placeholder="Built Up Area" className="w-full p-3 border rounded" required />
                 <input name="undividedShare" placeholder="Undivided Share" className="w-full p-3 border rounded" required />
                 <textarea name="amenities" placeholder="Amenities" className="w-full p-3 border rounded h-24" required />

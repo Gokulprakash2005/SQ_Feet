@@ -13,7 +13,7 @@ datasource db {
 }
 
 model TemplateDetails {
-  id              Int      @id @default(autoincrement())
+  id              Int      @id
   propertyTitle   String
   locationAddress String
   city            String
@@ -24,7 +24,7 @@ model TemplateDetails {
 }
 
 model Description {
-  id                   Int      @id @default(autoincrement())
+  id                   Int      @id
   realSecurity         String
   ampleParking         String
   smartHomeIntegration String
@@ -34,7 +34,7 @@ model Description {
 }
 
 model BasicDetails {
-  id           Int      @id @default(autoincrement())
+  id           Int      @id
   propertyType String
   propertySize String
   bedrooms     Int
@@ -47,7 +47,7 @@ model BasicDetails {
 }
 
 model Location {
-  id        Int      @id @default(autoincrement())
+  id        Int      @id
   address   String
   city      String
   pincode   Int
@@ -56,7 +56,7 @@ model Location {
 }
 
 model StatusAvailability {
-  id               Int      @id @default(autoincrement())
+  id               Int      @id
   propertyStatus   String
   ageOfProperty    String
   availableFrom    DateTime
@@ -66,7 +66,7 @@ model StatusAvailability {
 }
 
 model AreaDetails {
-  id              Int      @id @default(autoincrement())
+  id              Int      @id
   builtUpArea     String
   undividedShare  String
   amenities       String

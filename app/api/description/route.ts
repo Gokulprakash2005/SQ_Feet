@@ -14,13 +14,13 @@ export async function OPTIONS() {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const title = searchParams.get('title')
+    const id = searchParams.get('id')
     
-    if (title) {
-      const description = await prisma.description.findFirst({
-        where: { realSecurity: { contains: title, mode: 'insensitive' } }
+    if (id) {
+      const description = await prisma.description.findUnique({
+        where: { id: parseInt(id) }
       })
-      return NextResponse.json(description, { headers: corsHeaders })
+      return NextResponse.json(description || null, { headers: corsHeaders })
     }
     
     const descriptions = await prisma.description.findMany({
@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(descriptions || [], { headers: corsHeaders })
   } catch (error) {
     console.error('Description fetch error:', error)
-    return NextResponse.json([], { headers: corsHeaders })
+    const id = new URL(request.url).searchParams.get('id')
+    return NextResponse.json(id ? null : [], { headers: corsHeaders })
   }
 }
 
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
     
     const description = await prisma.description.create({
       data: {
+        id: parseInt(data.id),
         realSecurity: data.realSecurity,
         ampleParking: data.ampleParking,
         smartHomeIntegration: data.smartHomeIntegration,

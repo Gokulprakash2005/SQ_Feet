@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
     
     const templateDetails = await prisma.templateDetails.create({
       data: {
+        id: parseInt(data.id),
         propertyTitle: data.propertyTitle,
         locationAddress: data.locationAddress,
         city: data.city,
