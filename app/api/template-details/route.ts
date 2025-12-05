@@ -46,16 +46,25 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json()
+    const formData = await request.formData()
+    const image = formData.get('image') as File
+    
+    let imageUrl = ''
+    if (image && image.size > 0) {
+      // Convert image to base64 for simple storage
+      const bytes = await image.arrayBuffer()
+      const buffer = Buffer.from(bytes)
+      imageUrl = `data:${image.type};base64,${buffer.toString('base64')}`
+    }
     
     const templateDetails = await prisma.templateDetails.create({
       data: {
-        id: parseInt(data.id),
-        propertyTitle: data.propertyTitle,
-        locationAddress: data.locationAddress,
-        city: data.city,
-        price: parseInt(data.price),
-        imageUrl: data.imageUrl
+        id: parseInt(formData.get('id') as string),
+        propertyTitle: formData.get('propertyTitle') as string,
+        locationAddress: formData.get('locationAddress') as string,
+        city: formData.get('city') as string,
+        price: parseInt(formData.get('price') as string),
+        imageUrl: imageUrl || null
       }
     })
     
@@ -67,20 +76,39 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const data = await request.json()
+    const formData = await request.formData()
+    const image = formData.get('image') as File
+    const oldId = parseInt(formData.get('oldId') as string)
+    const newId = parseInt(formData.get('id') as string)
     
-    const templateDetails = await prisma.templateDetails.update({
-      where: { id: data.id },
-      data: {
-        propertyTitle: data.propertyTitle,
-        locationAddress: data.locationAddress,
-        city: data.city,
-        price: parseInt(data.price),
-        imageUrl: data.imageUrl
-      }
-    })
+    let imageUrl = ''
+    if (image && image.size > 0) {
+      const bytes = await image.arrayBuffer()
+      const buffer = Buffer.from(bytes)
+      imageUrl = `data:${image.type};base64,${buffer.toString('base64')}`
+    }
     
-    return NextResponse.json(templateDetails, { headers: corsHeaders })
+    const updateData = {
+      propertyTitle: formData.get('propertyTitle') as string,
+      locationAddress: formData.get('locationAddress') as string,
+      city: formData.get('city') as string,
+      price: parseInt(formData.get('price') as string),
+      ...(imageUrl && { imageUrl })
+    }
+    
+    if (oldId !== newId) {
+      await prisma.templateDetails.delete({ where: { id: oldId } })
+      const templateDetails = await prisma.templateDetails.create({
+        data: { id: newId, ...updateData }
+      })
+      return NextResponse.json(templateDetails, { headers: corsHeaders })
+    } else {
+      const templateDetails = await prisma.templateDetails.update({
+        where: { id: oldId },
+        data: updateData
+      })
+      return NextResponse.json(templateDetails, { headers: corsHeaders })
+    }
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update template details' }, { status: 500, headers: corsHeaders })
   }

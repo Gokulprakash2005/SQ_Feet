@@ -37,16 +37,17 @@ export default function AdminPage() {
     setLoading(true)
     
     const formData = new FormData(e.currentTarget)
-    const formDataObj = Object.fromEntries(formData.entries())
+    
+    if (editingId) {
+      formData.append('oldId', editingId.toString())
+    }
     
     try {
       const method = editingId ? 'PUT' : 'POST'
-      const body = editingId ? { ...formDataObj, id: editingId } : formDataObj
       
       const response = await fetch(`/api/${endpoint}`, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: formData
       })
       
       if (response.ok) {
@@ -232,7 +233,7 @@ export default function AdminPage() {
                 <input name="locationAddress" placeholder="Location Address" className="w-full p-3 border rounded" required />
                 <input name="city" placeholder="City" className="w-full p-3 border rounded" required />
                 <input name="price" type="number" placeholder="Price" className="w-full p-3 border rounded" required />
-                <input name="imageUrl" placeholder="Image URL" className="w-full p-3 border rounded" />
+                <input name="image" type="file" accept="image/*" className="w-full p-3 border rounded" />
                 <div className="flex gap-2">
                   <button type="submit" disabled={loading} className="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 disabled:opacity-50">
                     {loading ? 'Saving...' : (editingId ? 'Update' : 'Save')} Template Details
