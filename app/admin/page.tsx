@@ -9,6 +9,7 @@ export default function AdminPage() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [mounted, setMounted] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const formRefs = useRef<{ [key: string]: HTMLFormElement | null }>({})
 
   useEffect(() => {
@@ -56,6 +57,7 @@ export default function AdminPage() {
           formRefs.current[activeTab]!.reset()
         }
         setEditingId(null)
+        setSelectedImage(null)
         await fetchData(endpoint)
       } else {
         const errorData = await response.json()
@@ -135,6 +137,7 @@ export default function AdminPage() {
 
   const resetForm = () => {
     setEditingId(null)
+    setSelectedImage(null)
     if (formRefs.current[activeTab]) {
       formRefs.current[activeTab]!.reset()
     }
@@ -233,7 +236,44 @@ export default function AdminPage() {
                 <input name="locationAddress" placeholder="Location Address" className="w-full p-3 border rounded" required />
                 <input name="city" placeholder="City" className="w-full p-3 border rounded" required />
                 <input name="price" type="number" placeholder="Price" className="w-full p-3 border rounded" required />
-                <input name="image" type="file" accept="image/*" className="w-full p-3 border rounded" />
+                <div className="w-full">
+                  <input 
+                    id="image-upload" 
+                    name="image" 
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden" 
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      setSelectedImage(file ? file.name : null)
+                    }}
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => document.getElementById('image-upload')?.click()}
+                    className={`w-full p-3 border-2 border-dashed rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                      selectedImage 
+                        ? 'border-green-400 bg-green-50 text-green-700' 
+                        : 'border-gray-300 hover:border-blue-400 text-gray-600 hover:text-blue-600'
+                    }`}
+                  >
+                    {selectedImage ? (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        {selectedImage}
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        Upload Image
+                      </>
+                    )}
+                  </button>
+                </div>
                 <div className="flex gap-2">
                   <button type="submit" disabled={loading} className="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 disabled:opacity-50">
                     {loading ? 'Saving...' : (editingId ? 'Update' : 'Save')} Template Details
