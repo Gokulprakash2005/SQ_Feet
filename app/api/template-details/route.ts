@@ -29,10 +29,7 @@ export async function GET(request: NextRequest) {
     
     const templateDetails = await prisma.templateDetails.findMany({
       where: search ? {
-        OR: [
-          { propertyTitle: { contains: search, mode: 'insensitive' } },
-          { city: { contains: search, mode: 'insensitive' } }
-        ]
+        propertyTitle: { contains: search, mode: 'insensitive' }
       } : {},
       orderBy: { createdAt: 'desc' }
     })
@@ -62,8 +59,8 @@ export async function POST(request: NextRequest) {
         id: parseInt(formData.get('id') as string),
         propertyTitle: formData.get('propertyTitle') as string,
         locationAddress: formData.get('locationAddress') as string,
-        city: formData.get('city') as string,
         price: parseInt(formData.get('price') as string),
+        featured: formData.get('featured') as string,
         imageUrl: imageUrl || null
       }
     })
@@ -91,8 +88,8 @@ export async function PUT(request: NextRequest) {
     const updateData = {
       propertyTitle: formData.get('propertyTitle') as string,
       locationAddress: formData.get('locationAddress') as string,
-      city: formData.get('city') as string,
       price: parseInt(formData.get('price') as string),
+      featured: formData.get('featured') as string,
       ...(imageUrl && { imageUrl })
     }
     

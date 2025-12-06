@@ -200,7 +200,7 @@ export default function AdminPage() {
                       <tr key={item.id} className="border-t">
                         <td className="p-2">{item.id}</td>
                         <td className="p-2">
-                          {activeTab === 'template' && `${item.propertyTitle} - ${item.city}`}
+                          {activeTab === 'template' && `${item.propertyTitle} - ${item.featured}`}
                           {activeTab === 'description' && item.realSecurity?.substring(0, 30) + '...'}
                           {activeTab === 'basic' && `${item.propertyType} - ${item.bedrooms}BR`}
                           {activeTab === 'location' && `${item.city} - ${item.pincode}`}
@@ -234,8 +234,12 @@ export default function AdminPage() {
                 <input name="id" type="number" placeholder="ID" className="w-full p-3 border rounded" required />
                 <input name="propertyTitle" placeholder="Property Title" className="w-full p-3 border rounded" required />
                 <input name="locationAddress" placeholder="Location Address" className="w-full p-3 border rounded" required />
-                <input name="city" placeholder="City" className="w-full p-3 border rounded" required />
                 <input name="price" type="number" placeholder="Price" className="w-full p-3 border rounded" required />
+                <select name="featured" className="w-full p-3 border rounded" required>
+                  <option value="">Select Featured Status</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
                 <div className="w-full">
                   <input 
                     id="image-upload" 

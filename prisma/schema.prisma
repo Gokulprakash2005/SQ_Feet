@@ -16,8 +16,8 @@ model TemplateDetails {
   id              Int      @id
   propertyTitle   String
   locationAddress String
-  city            String
   price           Int
+  featured        String   @default("no")
   imageUrl        String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
