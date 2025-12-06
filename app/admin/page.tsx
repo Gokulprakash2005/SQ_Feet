@@ -11,6 +11,7 @@ export default function AdminPage() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [mounted, setMounted] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const formRefs = useRef<{ [key: string]: HTMLFormElement | null }>({})
 
   useEffect(() => {
@@ -45,16 +46,17 @@ export default function AdminPage() {
     setLoading(true)
     
     const formData = new FormData(e.currentTarget)
-    const formDataObj = Object.fromEntries(formData.entries())
+    
+    if (editingId) {
+      formData.append('oldId', editingId.toString())
+    }
     
     try {
       const method = editingId ? 'PUT' : 'POST'
-      const body = editingId ? { ...formDataObj, id: editingId } : formDataObj
       
       const response = await fetch(`/api/${endpoint}`, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: formData
       })
       
       if (response.ok) {
@@ -63,6 +65,7 @@ export default function AdminPage() {
           formRefs.current[activeTab]!.reset()
         }
         setEditingId(null)
+        setSelectedImage(null)
         await fetchData(endpoint)
       } else {
         const errorData = await response.json()
@@ -142,6 +145,7 @@ export default function AdminPage() {
 
   const resetForm = () => {
     setEditingId(null)
+    setSelectedImage(null)
     if (formRefs.current[activeTab]) {
       formRefs.current[activeTab]!.reset()
     }
@@ -212,7 +216,7 @@ export default function AdminPage() {
                       <tr key={item.id} className="border-t border-slate-200 hover:bg-slate-50">
                         <td className="p-2 text-slate-800">{item.id}</td>
                         <td className="p-2 text-slate-600">
-                          {activeTab === 'template' && `${item.propertyTitle} - ₹${item.price}`}
+                          {activeTab === 'template' && `${item.propertyTitle} - ${item.featured}`}
                           {activeTab === 'description' && item.realSecurity?.substring(0, 30) + '...'}
                           {activeTab === 'basic' && `${item.propertyType} - ${item.bedrooms}BR`}
                           {activeTab === 'location' && `${item.city} - ${item.pincode}`}
@@ -247,11 +251,49 @@ export default function AdminPage() {
                 <input name="propertyTitle" placeholder="Property Title" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
                 <input name="locationAddress" placeholder="Location Address" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
                 <input name="price" type="number" placeholder="Price" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
-                <input name="imageUrl" placeholder="Image URL" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" />
                 <select name="featured" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required>
-                  <option value="no">Not Featured</option>
-                  <option value="yes">Featured</option>
+                  <option value="">Select Featured Status</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
                 </select>
+                <div className="w-full">
+                  <input 
+                    id="image-upload" 
+                    name="image" 
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden" 
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      setSelectedImage(file ? file.name : null)
+                    }}
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => document.getElementById('image-upload')?.click()}
+                    className={`w-full p-3 border-2 border-dashed rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                      selectedImage 
+                        ? 'border-green-400 bg-green-50 text-green-700' 
+                        : 'border-slate-300 hover:border-amber-400 text-slate-600 hover:text-amber-600'
+                    }`}
+                  >
+                    {selectedImage ? (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        {selectedImage}
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        Upload Image
+                      </>
+                    )}
+                  </button>
+                </div>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <button type="submit" disabled={loading} className="bg-amber-500 text-white px-6 py-3 rounded-lg hover:bg-amber-600 disabled:opacity-50 transition-colors duration-200">
                     {loading ? 'Saving...' : (editingId ? 'Update' : 'Save')} Template Details
