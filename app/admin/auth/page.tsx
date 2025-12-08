@@ -80,7 +80,7 @@ export default function AdminAuth() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-stone-50 to-zinc-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-orange-200 via-orange-300 to-orange-400 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo/Brand Section */}
         <div className="text-center mb-8">

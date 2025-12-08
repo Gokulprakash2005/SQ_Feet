@@ -156,7 +156,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-stone-50 to-zinc-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-orange-200 via-orange-400 to-orange-700 p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl text-slate-800 font-bold mb-4 sm:mb-0">Admin Panel</h1>
