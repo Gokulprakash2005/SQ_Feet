@@ -1,32 +1,32 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const router = useRouter()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     // TODO: Replace with actual authentication logic
     // For now, simple demo credentials
-    if (email === 'admin@sqfeet.com' && password === 'admin123') {
+    if (email === "admin@sqfeet.com" && password === "admin123") {
       setTimeout(() => {
-        router.push('/admin')
-      }, 500)
+        router.push("/admin");
+      }, 500);
     } else {
-      setError('Invalid email or password')
-      setLoading(false)
+      setError("Invalid email or password");
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-stone-50 to-zinc-50 flex items-center justify-center p-4">
@@ -53,8 +53,8 @@ export default function AdminLogin() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Input */}
             <div>
-              <label 
-                htmlFor="email" 
+              <label
+                htmlFor="email"
                 className="block text-sm font-medium text-slate-700 mb-2"
               >
                 Email Address
@@ -75,8 +75,8 @@ export default function AdminLogin() {
 
             {/* Password Input */}
             <div>
-              <label 
-                htmlFor="password" 
+              <label
+                htmlFor="password"
                 className="block text-sm font-medium text-slate-700 mb-2"
               >
                 Password
@@ -112,7 +112,7 @@ export default function AdminLogin() {
                 />
                 <span className="text-slate-600">Remember me</span>
               </label>
-              <button 
+              <button
                 type="button"
                 className="text-amber-600 hover:text-amber-700 font-medium transition-colors"
               >
@@ -132,14 +132,30 @@ export default function AdminLogin() {
             >
               {loading ? (
                 <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Signing in...
                 </span>
               ) : (
-                'Sign In'
+                "Sign In"
               )}
             </button>
           </form>
@@ -150,9 +166,9 @@ export default function AdminLogin() {
               Demo credentials: admin@sqfeet.com / admin123
             </p>
             <p className="text-sm text-slate-600 text-center">
-              Don't have an account?{' '}
-              <Link 
-                href="/admin/signup" 
+              Don't have an account?{" "}
+              <Link
+                href="/admin/signup"
                 className="text-amber-600 hover:text-amber-700 font-semibold transition-colors"
               >
                 Sign Up
@@ -167,5 +183,5 @@ export default function AdminLogin() {
         </p>
       </div>
     </div>
-  )
+  );
 }

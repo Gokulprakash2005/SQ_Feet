@@ -9,6 +9,9 @@ export default function AdminAuth() {
   const [mode, setMode] = useState<AuthMode>('login')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showLoginPassword, setShowLoginPassword] = useState(false)
+  const [showSignupPassword, setShowSignupPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const router = useRouter()
 
   // Login form state
@@ -32,12 +35,30 @@ export default function AdminAuth() {
     setError('')
     setLoading(true)
 
-    // TODO: Replace with actual authentication logic
+    // Check demo admin credentials
     if (loginData.email === 'admin@sqfeet.com' && loginData.password === 'admin123') {
+      localStorage.setItem('isAuthenticated', 'true')
       setTimeout(() => {
         router.push('/admin')
       }, 500)
-    } else {
+      return
+    }
+
+    // Check registered users
+    try {
+      const users = JSON.parse(localStorage.getItem('sqfeet_users') || '[]')
+      const user = users.find((u: any) => u.email === loginData.email && u.password === loginData.password)
+      
+      if (user) {
+        localStorage.setItem('isAuthenticated', 'true')
+        setTimeout(() => {
+          router.push('/admin')
+        }, 500)
+      } else {
+        setError('Invalid email or password')
+        setLoading(false)
+      }
+    } catch (error) {
       setError('Invalid email or password')
       setLoading(false)
     }
@@ -64,23 +85,39 @@ export default function AdminAuth() {
 
     setLoading(true)
 
-    // TODO: Replace with actual registration API call
-    setTimeout(() => {
-      alert('Account created successfully!')
-      setMode('login')
-      setSignupData({
-        fullName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        agreedToTerms: false
+    // Save user data to localStorage (demo purpose - replace with actual API call)
+    try {
+      const users = JSON.parse(localStorage.getItem('sqfeet_users') || '[]')
+      
+      // Check if email already exists
+      if (users.some((user: any) => user.email === signupData.email)) {
+        setError('Email already registered')
+        setLoading(false)
+        return
+      }
+
+      // Add new user
+      users.push({
+        fullName: signupData.fullName,
+        email: signupData.email,
+        password: signupData.password, // In production, this should be hashed
+        createdAt: new Date().toISOString()
       })
+
+      localStorage.setItem('sqfeet_users', JSON.stringify(users))
+      localStorage.setItem('isAuthenticated', 'true')
+      
+      setTimeout(() => {
+        router.push('/admin')
+      }, 500)
+    } catch (error) {
+      setError('Failed to create account. Please try again.')
       setLoading(false)
-    }, 1000)
+    }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-200 via-orange-300 to-orange-400 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo/Brand Section */}
         <div className="text-center mb-8">
@@ -166,18 +203,36 @@ export default function AdminAuth() {
                     >
                       Password
                     </label>
-                    <input
-                      id="login-password"
-                      type="password"
-                      value={loginData.password}
-                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                      required
-                      placeholder="••••••••"
-                      className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-slate-50 
-                               text-slate-800 placeholder-slate-400
-                               focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
-                               transition-all duration-200"
-                    />
+                    <div className="relative">
+                      <input
+                        id="login-password"
+                        type={showLoginPassword ? "text" : "password"}
+                        value={loginData.password}
+                        onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                        required
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 pr-12 rounded-lg border border-slate-300 bg-slate-50 
+                                 text-slate-800 placeholder-slate-400
+                                 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
+                                 transition-all duration-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowLoginPassword(!showLoginPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      >
+                        {showLoginPassword ? (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                          </svg>
+                        ) : (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                   </div>
 
                   {/* Remember Me & Forgot Password */}
@@ -212,7 +267,7 @@ export default function AdminAuth() {
                     type="submit"
                     disabled={loading}
                     className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold
-                             py-3.5 px-6 rounded-lg transition-all duration-200
+                             py-3.5 px-6 rounded-2xl transition-all duration-200
                              focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2
                              disabled:opacity-50 disabled:cursor-not-allowed
                              shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
@@ -303,18 +358,36 @@ export default function AdminAuth() {
                     >
                       Password
                     </label>
-                    <input
-                      id="signup-password"
-                      type="password"
-                      value={signupData.password}
-                      onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                      required
-                      placeholder="••••••••"
-                      className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-slate-50 
-                               text-slate-800 placeholder-slate-400
-                               focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
-                               transition-all duration-200"
-                    />
+                    <div className="relative">
+                      <input
+                        id="signup-password"
+                        type={showSignupPassword ? "text" : "password"}
+                        value={signupData.password}
+                        onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                        required
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 pr-12 rounded-lg border border-slate-300 bg-slate-50 
+                                 text-slate-800 placeholder-slate-400
+                                 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
+                                 transition-all duration-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSignupPassword(!showSignupPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      >
+                        {showSignupPassword ? (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                          </svg>
+                        ) : (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                     <p className="text-xs text-slate-500 mt-1">
                       Must be at least 8 characters
                     </p>
@@ -328,18 +401,36 @@ export default function AdminAuth() {
                     >
                       Confirm Password
                     </label>
-                    <input
-                      id="signup-confirm"
-                      type="password"
-                      value={signupData.confirmPassword}
-                      onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
-                      required
-                      placeholder="••••••••"
-                      className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-slate-50 
-                               text-slate-800 placeholder-slate-400
-                               focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
-                               transition-all duration-200"
-                    />
+                    <div className="relative">
+                      <input
+                        id="signup-confirm"
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={signupData.confirmPassword}
+                        onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
+                        required
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 pr-12 rounded-lg border border-slate-300 bg-slate-50 
+                                 text-slate-800 placeholder-slate-400
+                                 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
+                                 transition-all duration-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      >
+                        {showConfirmPassword ? (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                          </svg>
+                        ) : (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                   </div>
 
                   {/* Terms Checkbox */}
