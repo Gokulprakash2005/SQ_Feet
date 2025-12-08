@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function AdminPage() {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState('template')
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState<any[]>([])
@@ -15,6 +17,12 @@ export default function AdminPage() {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated')
+    sessionStorage.clear()
+    router.push('/admin/auth')
+  }
 
   const fetchData = async (endpoint: string) => {
     try {
@@ -148,21 +156,29 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Admin Panel</h1>
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-stone-50 to-zinc-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl text-slate-800 font-bold mb-4 sm:mb-0">Admin Panel</h1>
+          <button
+            onClick={handleLogout}
+            className="bg-amber-500 hover:bg-amber-600 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg w-full sm:w-auto"
+          >
+            Logout
+          </button>
+        </div>
         
-        <div className="bg-white rounded-lg shadow-md">
-          <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6">
+        <div className="bg-white rounded-xl shadow-lg">
+          <div className="border-b border-slate-200 overflow-x-auto">
+            <nav className="flex space-x-4 sm:space-x-8 px-4 sm:px-6 min-w-max">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                      ? 'border-amber-500 text-amber-600'
+                      : 'border-transparent text-slate-500 hover:text-slate-700'
                   }`}
                 >
                   {tab.label}
@@ -171,35 +187,35 @@ export default function AdminPage() {
             </nav>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {activeTab === 'template' && (
               <div className="mb-4">
                 <input
                   type="text"
-                  placeholder="Search by property title or city..."
+                  placeholder="Search by property title..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full p-3 border rounded"
+                  className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800"
                 />
               </div>
             )}
             
             <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-3">Existing Records</h3>
-              <div className="max-h-64 overflow-y-auto border rounded">
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50">
+              <h3 className="text-base sm:text-lg font-semibold mb-3 text-slate-800">Existing Records</h3>
+              <div className="max-h-64 overflow-y-auto border border-slate-200 rounded-lg">
+                <table className="w-full text-xs sm:text-sm">
+                  <thead className="bg-slate-50">
                     <tr>
-                      <th className="p-2 text-left">ID</th>
-                      <th className="p-2 text-left">Details</th>
-                      <th className="p-2 text-left">Actions</th>
+                      <th className="p-2 text-left text-slate-700">ID</th>
+                      <th className="p-2 text-left text-slate-700">Details</th>
+                      <th className="p-2 text-left text-slate-700">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {data.map((item) => (
-                      <tr key={item.id} className="border-t">
-                        <td className="p-2">{item.id}</td>
-                        <td className="p-2">
+                      <tr key={item.id} className="border-t border-slate-200 hover:bg-slate-50">
+                        <td className="p-2 text-slate-800">{item.id}</td>
+                        <td className="p-2 text-slate-600">
                           {activeTab === 'template' && `${item.propertyTitle} - ${item.featured}`}
                           {activeTab === 'description' && item.realSecurity?.substring(0, 30) + '...'}
                           {activeTab === 'basic' && `${item.propertyType} - ${item.bedrooms}BR`}
@@ -207,16 +223,16 @@ export default function AdminPage() {
                           {activeTab === 'status' && item.propertyStatus}
                           {activeTab === 'area' && item.builtUpArea}
                         </td>
-                        <td className="p-2">
+                        <td className="p-2 flex gap-2">
                           <button
                             onClick={() => handleEdit(item)}
-                            className="bg-yellow-500 text-white px-2 py-1 rounded text-xs mr-2"
+                            className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-lg text-xs transition-colors duration-200"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => handleDelete(item.id, currentEndpoint)}
-                            className="bg-red-500 text-white px-2 py-1 rounded text-xs"
+                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-xs transition-colors duration-200"
                           >
                             Delete
                           </button>
@@ -230,12 +246,12 @@ export default function AdminPage() {
 
             {activeTab === 'template' && (
               <form ref={(el) => { formRefs.current['template'] = el }} onSubmit={(e) => handleSubmit(e, 'template-details')} className="space-y-4">
-                <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit' : 'Add'} Template Details</h2>
-                <input name="id" type="number" placeholder="ID" className="w-full p-3 border rounded" required />
-                <input name="propertyTitle" placeholder="Property Title" className="w-full p-3 border rounded" required />
-                <input name="locationAddress" placeholder="Location Address" className="w-full p-3 border rounded" required />
-                <input name="price" type="number" placeholder="Price" className="w-full p-3 border rounded" required />
-                <select name="featured" className="w-full p-3 border rounded" required>
+                <h2 className="text-lg sm:text-xl font-semibold mb-4 text-slate-800">{editingId ? 'Edit' : 'Add'} Template Details</h2>
+                <input name="id" type="number" placeholder="ID" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <input name="propertyTitle" placeholder="Property Title" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <input name="locationAddress" placeholder="Location Address" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <input name="price" type="number" placeholder="Price" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <select name="featured" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required>
                   <option value="">Select Featured Status</option>
                   <option value="yes">Yes</option>
                   <option value="no">No</option>
@@ -258,7 +274,7 @@ export default function AdminPage() {
                     className={`w-full p-3 border-2 border-dashed rounded-lg transition-colors flex items-center justify-center gap-2 ${
                       selectedImage 
                         ? 'border-green-400 bg-green-50 text-green-700' 
-                        : 'border-gray-300 hover:border-blue-400 text-gray-600 hover:text-blue-600'
+                        : 'border-slate-300 hover:border-amber-400 text-slate-600 hover:text-amber-600'
                     }`}
                   >
                     {selectedImage ? (
@@ -278,12 +294,12 @@ export default function AdminPage() {
                     )}
                   </button>
                 </div>
-                <div className="flex gap-2">
-                  <button type="submit" disabled={loading} className="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 disabled:opacity-50">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button type="submit" disabled={loading} className="bg-amber-500 text-white px-6 py-3 rounded-lg hover:bg-amber-600 disabled:opacity-50 transition-colors duration-200">
                     {loading ? 'Saving...' : (editingId ? 'Update' : 'Save')} Template Details
                   </button>
                   {editingId && (
-                    <button type="button" onClick={resetForm} className="bg-gray-500 text-white px-6 py-3 rounded hover:bg-gray-600">
+                    <button type="button" onClick={resetForm} className="bg-slate-500 text-white px-6 py-3 rounded-lg hover:bg-slate-600 transition-colors duration-200">
                       Cancel
                     </button>
                   )}
@@ -293,18 +309,18 @@ export default function AdminPage() {
 
             {activeTab === 'description' && (
               <form ref={(el) => { formRefs.current['description'] = el }} onSubmit={(e) => handleSubmit(e, 'description')} className="space-y-4">
-                <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit' : 'Add'} Description</h2>
-                <input name="id" type="number" placeholder="ID" className="w-full p-3 border rounded" required />
-                <textarea name="realSecurity" placeholder="Real Security" className="w-full p-3 border rounded h-24" required />
-                <textarea name="ampleParking" placeholder="Ample Parking" className="w-full p-3 border rounded h-24" required />
-                <textarea name="smartHomeIntegration" placeholder="Smart Home Integration" className="w-full p-3 border rounded h-24" required />
-                <textarea name="verifiedSafety" placeholder="Verified Safety" className="w-full p-3 border rounded h-24" required />
-                <div className="flex gap-2">
-                  <button type="submit" disabled={loading} className="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 disabled:opacity-50">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4 text-slate-800">{editingId ? 'Edit' : 'Add'} Description</h2>
+                <input name="id" type="number" placeholder="ID" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <textarea name="realSecurity" placeholder="Real Security" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800 h-24" required />
+                <textarea name="ampleParking" placeholder="Ample Parking" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800 h-24" required />
+                <textarea name="smartHomeIntegration" placeholder="Smart Home Integration" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800 h-24" required />
+                <textarea name="verifiedSafety" placeholder="Verified Safety" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800 h-24" required />
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button type="submit" disabled={loading} className="bg-amber-500 text-white px-6 py-3 rounded-lg hover:bg-amber-600 disabled:opacity-50 transition-colors duration-200">
                     {loading ? 'Saving...' : (editingId ? 'Update' : 'Save')} Description
                   </button>
                   {editingId && (
-                    <button type="button" onClick={resetForm} className="bg-gray-500 text-white px-6 py-3 rounded hover:bg-gray-600">
+                    <button type="button" onClick={resetForm} className="bg-slate-500 text-white px-6 py-3 rounded-lg hover:bg-slate-600 transition-colors duration-200">
                       Cancel
                     </button>
                   )}
@@ -314,21 +330,23 @@ export default function AdminPage() {
 
             {activeTab === 'basic' && (
               <form ref={(el) => { formRefs.current['basic'] = el }} onSubmit={(e) => handleSubmit(e, 'basic-details')} className="space-y-4">
-                <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit' : 'Add'} Basic Details</h2>
-                <input name="id" type="number" placeholder="ID" className="w-full p-3 border rounded" required />
-                <input name="propertyType" placeholder="Property Type" className="w-full p-3 border rounded" required />
-                <input name="propertySize" placeholder="Property Size" className="w-full p-3 border rounded" required />
-                <input name="bedrooms" type="number" placeholder="Bedrooms" className="w-full p-3 border rounded" required />
-                <input name="bathrooms" type="number" placeholder="Bathrooms" className="w-full p-3 border rounded" required />
-                <input name="balconies" type="number" placeholder="Balconies" className="w-full p-3 border rounded" required />
-                <input name="totalFloors" type="number" placeholder="Total Floors" className="w-full p-3 border rounded" required />
-                <input name="floorNumber" type="number" placeholder="Floor Number" className="w-full p-3 border rounded" required />
-                <div className="flex gap-2">
-                  <button type="submit" disabled={loading} className="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 disabled:opacity-50">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4 text-slate-800">{editingId ? 'Edit' : 'Add'} Basic Details</h2>
+                <input name="id" type="number" placeholder="ID" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <input name="propertyType" placeholder="Property Type" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <input name="propertySize" placeholder="Property Size" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <input name="bedrooms" type="number" placeholder="Bedrooms" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                  <input name="bathrooms" type="number" placeholder="Bathrooms" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                  <input name="balconies" type="number" placeholder="Balconies" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                  <input name="totalFloors" type="number" placeholder="Total Floors" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                </div>
+                <input name="floorNumber" type="number" placeholder="Floor Number" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button type="submit" disabled={loading} className="bg-amber-500 text-white px-6 py-3 rounded-lg hover:bg-amber-600 disabled:opacity-50 transition-colors duration-200">
                     {loading ? 'Saving...' : (editingId ? 'Update' : 'Save')} Basic Details
                   </button>
                   {editingId && (
-                    <button type="button" onClick={resetForm} className="bg-gray-500 text-white px-6 py-3 rounded hover:bg-gray-600">
+                    <button type="button" onClick={resetForm} className="bg-slate-500 text-white px-6 py-3 rounded-lg hover:bg-slate-600 transition-colors duration-200">
                       Cancel
                     </button>
                   )}
@@ -338,17 +356,19 @@ export default function AdminPage() {
 
             {activeTab === 'location' && (
               <form ref={(el) => { formRefs.current['location'] = el }} onSubmit={(e) => handleSubmit(e, 'location')} className="space-y-4">
-                <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit' : 'Add'} Location</h2>
-                <input name="id" type="number" placeholder="ID" className="w-full p-3 border rounded" required />
-                <input name="address" placeholder="Address" className="w-full p-3 border rounded" required />
-                <input name="city" placeholder="City" className="w-full p-3 border rounded" required />
-                <input name="pincode" type="number" placeholder="Pincode" className="w-full p-3 border rounded" required />
-                <div className="flex gap-2">
-                  <button type="submit" disabled={loading} className="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 disabled:opacity-50">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4 text-slate-800">{editingId ? 'Edit' : 'Add'} Location</h2>
+                <input name="id" type="number" placeholder="ID" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <input name="address" placeholder="Address" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <input name="city" placeholder="City" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                  <input name="pincode" type="number" placeholder="Pincode" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button type="submit" disabled={loading} className="bg-amber-500 text-white px-6 py-3 rounded-lg hover:bg-amber-600 disabled:opacity-50 transition-colors duration-200">
                     {loading ? 'Saving...' : (editingId ? 'Update' : 'Save')} Location
                   </button>
                   {editingId && (
-                    <button type="button" onClick={resetForm} className="bg-gray-500 text-white px-6 py-3 rounded hover:bg-gray-600">
+                    <button type="button" onClick={resetForm} className="bg-slate-500 text-white px-6 py-3 rounded-lg hover:bg-slate-600 transition-colors duration-200">
                       Cancel
                     </button>
                   )}
@@ -358,18 +378,20 @@ export default function AdminPage() {
 
             {activeTab === 'status' && (
               <form ref={(el) => { formRefs.current['status'] = el }} onSubmit={(e) => handleSubmit(e, 'status-availability')} className="space-y-4">
-                <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit' : 'Add'} Status & Availability</h2>
-                <input name="id" type="number" placeholder="ID" className="w-full p-3 border rounded" required />
-                <input name="propertyStatus" placeholder="Property Status" className="w-full p-3 border rounded" required />
-                <input name="ageOfProperty" placeholder="Age of Property" className="w-full p-3 border rounded" required />
-                <input name="availableFrom" type="datetime-local" placeholder="Available From" className="w-full p-3 border rounded" required />
-                <input name="furnishingStatus" placeholder="Furnishing Status" className="w-full p-3 border rounded" required />
-                <div className="flex gap-2">
-                  <button type="submit" disabled={loading} className="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 disabled:opacity-50">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4 text-slate-800">{editingId ? 'Edit' : 'Add'} Status & Availability</h2>
+                <input name="id" type="number" placeholder="ID" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <input name="propertyStatus" placeholder="Property Status" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                  <input name="ageOfProperty" placeholder="Age of Property" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                </div>
+                <input name="availableFrom" type="datetime-local" placeholder="Available From" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <input name="furnishingStatus" placeholder="Furnishing Status" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button type="submit" disabled={loading} className="bg-amber-500 text-white px-6 py-3 rounded-lg hover:bg-amber-600 disabled:opacity-50 transition-colors duration-200">
                     {loading ? 'Saving...' : (editingId ? 'Update' : 'Save')} Status & Availability
                   </button>
                   {editingId && (
-                    <button type="button" onClick={resetForm} className="bg-gray-500 text-white px-6 py-3 rounded hover:bg-gray-600">
+                    <button type="button" onClick={resetForm} className="bg-slate-500 text-white px-6 py-3 rounded-lg hover:bg-slate-600 transition-colors duration-200">
                       Cancel
                     </button>
                   )}
@@ -379,18 +401,20 @@ export default function AdminPage() {
 
             {activeTab === 'area' && (
               <form ref={(el) => { formRefs.current['area'] = el }} onSubmit={(e) => handleSubmit(e, 'area-details')} className="space-y-4">
-                <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit' : 'Add'} Area Details</h2>
-                <input name="id" type="number" placeholder="ID" className="w-full p-3 border rounded" required />
-                <input name="builtUpArea" placeholder="Built Up Area" className="w-full p-3 border rounded" required />
-                <input name="undividedShare" placeholder="Undivided Share" className="w-full p-3 border rounded" required />
-                <textarea name="amenities" placeholder="Amenities" className="w-full p-3 border rounded h-24" required />
-                <textarea name="features" placeholder="Features" className="w-full p-3 border rounded h-24" required />
-                <div className="flex gap-2">
-                  <button type="submit" disabled={loading} className="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 disabled:opacity-50">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4 text-slate-800">{editingId ? 'Edit' : 'Add'} Area Details</h2>
+                <input name="id" type="number" placeholder="ID" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <input name="builtUpArea" placeholder="Built Up Area" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                  <input name="undividedShare" placeholder="Undivided Share" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800" required />
+                </div>
+                <textarea name="amenities" placeholder="Amenities" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800 h-24" required />
+                <textarea name="features" placeholder="Features" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-800 h-24" required />
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button type="submit" disabled={loading} className="bg-amber-500 text-white px-6 py-3 rounded-lg hover:bg-amber-600 disabled:opacity-50 transition-colors duration-200">
                     {loading ? 'Saving...' : (editingId ? 'Update' : 'Save')} Area Details
                   </button>
                   {editingId && (
-                    <button type="button" onClick={resetForm} className="bg-gray-500 text-white px-6 py-3 rounded hover:bg-gray-600">
+                    <button type="button" onClick={resetForm} className="bg-slate-500 text-white px-6 py-3 rounded-lg hover:bg-slate-600 transition-colors duration-200">
                       Cancel
                     </button>
                   )}
