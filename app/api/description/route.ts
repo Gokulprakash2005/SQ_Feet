@@ -36,15 +36,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json()
+    const formData = await request.formData()
     
     const description = await prisma.description.create({
       data: {
-        id: parseInt(data.id),
-        realSecurity: data.realSecurity,
-        ampleParking: data.ampleParking,
-        smartHomeIntegration: data.smartHomeIntegration,
-        verifiedSafety: data.verifiedSafety
+        id: parseInt(formData.get('id') as string),
+        realSecurity: formData.get('realSecurity') as string,
+        ampleParking: formData.get('ampleParking') as string,
+        smartHomeIntegration: formData.get('smartHomeIntegration') as string,
+        verifiedSafety: formData.get('verifiedSafety') as string
       }
     })
     
@@ -56,19 +56,30 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const data = await request.json()
+    const formData = await request.formData()
+    const oldId = parseInt(formData.get('oldId') as string) || parseInt(formData.get('id') as string)
+    const newId = parseInt(formData.get('id') as string)
     
-    const description = await prisma.description.update({
-      where: { id: data.id },
-      data: {
-        realSecurity: data.realSecurity,
-        ampleParking: data.ampleParking,
-        smartHomeIntegration: data.smartHomeIntegration,
-        verifiedSafety: data.verifiedSafety
-      }
-    })
+    const updateData = {
+      realSecurity: formData.get('realSecurity') as string,
+      ampleParking: formData.get('ampleParking') as string,
+      smartHomeIntegration: formData.get('smartHomeIntegration') as string,
+      verifiedSafety: formData.get('verifiedSafety') as string
+    }
     
-    return NextResponse.json(description, { headers: corsHeaders })
+    if (oldId !== newId) {
+      await prisma.description.delete({ where: { id: oldId } })
+      const description = await prisma.description.create({
+        data: { id: newId, ...updateData }
+      })
+      return NextResponse.json(description, { headers: corsHeaders })
+    } else {
+      const description = await prisma.description.update({
+        where: { id: oldId },
+        data: updateData
+      })
+      return NextResponse.json(description, { headers: corsHeaders })
+    }
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update description' }, { status: 500, headers: corsHeaders })
   }

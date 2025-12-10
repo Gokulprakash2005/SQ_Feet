@@ -33,15 +33,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json()
+    const formData = await request.formData()
     
     const statusAvailability = await prisma.statusAvailability.create({
       data: {
-        id: parseInt(data.id),
-        propertyStatus: data.propertyStatus,
-        ageOfProperty: data.ageOfProperty,
-        availableFrom: new Date(data.availableFrom),
-        furnishingStatus: data.furnishingStatus
+        id: parseInt(formData.get('id') as string),
+        propertyStatus: formData.get('propertyStatus') as string,
+        ageOfProperty: formData.get('ageOfProperty') as string,
+        availableFrom: new Date(formData.get('availableFrom') as string),
+        furnishingStatus: formData.get('furnishingStatus') as string
       }
     })
     
@@ -53,19 +53,30 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const data = await request.json()
+    const formData = await request.formData()
+    const oldId = parseInt(formData.get('oldId') as string) || parseInt(formData.get('id') as string)
+    const newId = parseInt(formData.get('id') as string)
     
-    const statusAvailability = await prisma.statusAvailability.update({
-      where: { id: data.id },
-      data: {
-        propertyStatus: data.propertyStatus,
-        ageOfProperty: data.ageOfProperty,
-        availableFrom: new Date(data.availableFrom),
-        furnishingStatus: data.furnishingStatus
-      }
-    })
+    const updateData = {
+      propertyStatus: formData.get('propertyStatus') as string,
+      ageOfProperty: formData.get('ageOfProperty') as string,
+      availableFrom: new Date(formData.get('availableFrom') as string),
+      furnishingStatus: formData.get('furnishingStatus') as string
+    }
     
-    return NextResponse.json(statusAvailability, { headers: corsHeaders })
+    if (oldId !== newId) {
+      await prisma.statusAvailability.delete({ where: { id: oldId } })
+      const statusAvailability = await prisma.statusAvailability.create({
+        data: { id: newId, ...updateData }
+      })
+      return NextResponse.json(statusAvailability, { headers: corsHeaders })
+    } else {
+      const statusAvailability = await prisma.statusAvailability.update({
+        where: { id: oldId },
+        data: updateData
+      })
+      return NextResponse.json(statusAvailability, { headers: corsHeaders })
+    }
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update status availability' }, { status: 500, headers: corsHeaders })
   }

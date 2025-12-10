@@ -33,14 +33,14 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json()
+    const formData = await request.formData()
     
     const location = await prisma.location.create({
       data: {
-        id: parseInt(data.id),
-        address: data.address,
-        city: data.city,
-        pincode: parseInt(data.pincode)
+        id: parseInt(formData.get('id') as string),
+        address: formData.get('address') as string,
+        city: formData.get('city') as string,
+        pincode: parseInt(formData.get('pincode') as string)
       }
     })
     
@@ -52,18 +52,29 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const data = await request.json()
+    const formData = await request.formData()
+    const oldId = parseInt(formData.get('oldId') as string) || parseInt(formData.get('id') as string)
+    const newId = parseInt(formData.get('id') as string)
     
-    const location = await prisma.location.update({
-      where: { id: data.id },
-      data: {
-        address: data.address,
-        city: data.city,
-        pincode: parseInt(data.pincode)
-      }
-    })
+    const updateData = {
+      address: formData.get('address') as string,
+      city: formData.get('city') as string,
+      pincode: parseInt(formData.get('pincode') as string)
+    }
     
-    return NextResponse.json(location, { headers: corsHeaders })
+    if (oldId !== newId) {
+      await prisma.location.delete({ where: { id: oldId } })
+      const location = await prisma.location.create({
+        data: { id: newId, ...updateData }
+      })
+      return NextResponse.json(location, { headers: corsHeaders })
+    } else {
+      const location = await prisma.location.update({
+        where: { id: oldId },
+        data: updateData
+      })
+      return NextResponse.json(location, { headers: corsHeaders })
+    }
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update location' }, { status: 500, headers: corsHeaders })
   }

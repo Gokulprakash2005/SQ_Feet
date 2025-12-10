@@ -31,18 +31,18 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json()
+    const formData = await request.formData()
     
     const basicDetails = await prisma.basicDetails.create({
       data: {
-        id: parseInt(data.id),
-        propertyType: data.propertyType,
-        propertySize: data.propertySize,
-        bedrooms: parseInt(data.bedrooms),
-        bathrooms: parseInt(data.bathrooms),
-        balconies: parseInt(data.balconies),
-        totalFloors: parseInt(data.totalFloors),
-        floorNumber: parseInt(data.floorNumber)
+        id: parseInt(formData.get('id') as string),
+        propertyType: formData.get('propertyType') as string,
+        propertySize: formData.get('propertySize') as string,
+        bedrooms: parseInt(formData.get('bedrooms') as string),
+        bathrooms: parseInt(formData.get('bathrooms') as string),
+        balconies: parseInt(formData.get('balconies') as string),
+        totalFloors: parseInt(formData.get('totalFloors') as string),
+        floorNumber: parseInt(formData.get('floorNumber') as string)
       }
     })
     
@@ -54,22 +54,33 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const data = await request.json()
+    const formData = await request.formData()
+    const oldId = parseInt(formData.get('oldId') as string) || parseInt(formData.get('id') as string)
+    const newId = parseInt(formData.get('id') as string)
     
-    const basicDetails = await prisma.basicDetails.update({
-      where: { id: data.id },
-      data: {
-        propertyType: data.propertyType,
-        propertySize: data.propertySize,
-        bedrooms: parseInt(data.bedrooms),
-        bathrooms: parseInt(data.bathrooms),
-        balconies: parseInt(data.balconies),
-        totalFloors: parseInt(data.totalFloors),
-        floorNumber: parseInt(data.floorNumber)
-      }
-    })
+    const updateData = {
+      propertyType: formData.get('propertyType') as string,
+      propertySize: formData.get('propertySize') as string,
+      bedrooms: parseInt(formData.get('bedrooms') as string),
+      bathrooms: parseInt(formData.get('bathrooms') as string),
+      balconies: parseInt(formData.get('balconies') as string),
+      totalFloors: parseInt(formData.get('totalFloors') as string),
+      floorNumber: parseInt(formData.get('floorNumber') as string)
+    }
     
-    return NextResponse.json(basicDetails, { headers: corsHeaders })
+    if (oldId !== newId) {
+      await prisma.basicDetails.delete({ where: { id: oldId } })
+      const basicDetails = await prisma.basicDetails.create({
+        data: { id: newId, ...updateData }
+      })
+      return NextResponse.json(basicDetails, { headers: corsHeaders })
+    } else {
+      const basicDetails = await prisma.basicDetails.update({
+        where: { id: oldId },
+        data: updateData
+      })
+      return NextResponse.json(basicDetails, { headers: corsHeaders })
+    }
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update basic details' }, { status: 500, headers: corsHeaders })
   }

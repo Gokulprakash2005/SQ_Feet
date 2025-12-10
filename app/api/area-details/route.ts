@@ -33,15 +33,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json()
+    const formData = await request.formData()
     
     const areaDetails = await prisma.areaDetails.create({
       data: {
-        id: parseInt(data.id),
-        builtUpArea: data.builtUpArea,
-        undividedShare: data.undividedShare,
-        amenities: data.amenities,
-        features: data.features
+        id: parseInt(formData.get('id') as string),
+        builtUpArea: formData.get('builtUpArea') as string,
+        undividedShare: formData.get('undividedShare') as string,
+        amenities: formData.get('amenities') as string,
+        features: formData.get('features') as string
       }
     })
     
@@ -53,19 +53,30 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const data = await request.json()
+    const formData = await request.formData()
+    const oldId = parseInt(formData.get('oldId') as string) || parseInt(formData.get('id') as string)
+    const newId = parseInt(formData.get('id') as string)
     
-    const areaDetails = await prisma.areaDetails.update({
-      where: { id: data.id },
-      data: {
-        builtUpArea: data.builtUpArea,
-        undividedShare: data.undividedShare,
-        amenities: data.amenities,
-        features: data.features
-      }
-    })
+    const updateData = {
+      builtUpArea: formData.get('builtUpArea') as string,
+      undividedShare: formData.get('undividedShare') as string,
+      amenities: formData.get('amenities') as string,
+      features: formData.get('features') as string
+    }
     
-    return NextResponse.json(areaDetails, { headers: corsHeaders })
+    if (oldId !== newId) {
+      await prisma.areaDetails.delete({ where: { id: oldId } })
+      const areaDetails = await prisma.areaDetails.create({
+        data: { id: newId, ...updateData }
+      })
+      return NextResponse.json(areaDetails, { headers: corsHeaders })
+    } else {
+      const areaDetails = await prisma.areaDetails.update({
+        where: { id: oldId },
+        data: updateData
+      })
+      return NextResponse.json(areaDetails, { headers: corsHeaders })
+    }
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update area details' }, { status: 500, headers: corsHeaders })
   }
